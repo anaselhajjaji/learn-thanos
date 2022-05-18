@@ -10,6 +10,6 @@ scrape_configs:
     static_configs:
       - targets: ['127.0.0.1:9091','127.0.0.1:9092']
 # Include sidecar
-#  - job_name: 'sidecar'
-#    static_configs:
-#      - targets: ['127.0.0.1:19091','127.0.0.1:19092']
+  - job_name: 'sidecar'
+    static_configs:
+      - targets: ['127.0.0.1:19091','127.0.0.1:19092']

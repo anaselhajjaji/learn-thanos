@@ -68,3 +68,49 @@ docker run -d --net=host --rm \
 
 Look for `prometheus_tsdb_head_series` metric for example.
 
+## Step 2: adding sidecars
+
+- add sidecar to "EU1" Prometheus
+
+```bash
+docker run -d --net=host --rm \
+    -v $(pwd)/prometheus-config/prometheus0_eu1.yml:/etc/prometheus/prometheus.yml \
+    --name prometheus-0-sidecar-eu1 \
+    -u root \
+    quay.io/thanos/thanos:v0.26.0 \
+    sidecar \
+    --http-address 0.0.0.0:19090 \
+    --grpc-address 0.0.0.0:19190 \
+    --reloader.config-file /etc/prometheus/prometheus.yml \
+    --prometheus.url http://127.0.0.1:9090
+```
+
+- Adding sidecars to each replica of Prometheus in "US1"
+
+```bash
+docker run -d --net=host --rm \
+    -v $(pwd)/prometheus-config/prometheus0_us1.yml:/etc/prometheus/prometheus.yml \
+    --name prometheus-0-sidecar-us1 \
+    -u root \
+    quay.io/thanos/thanos:v0.26.0 \
+    sidecar \
+    --http-address 0.0.0.0:19091 \
+    --grpc-address 0.0.0.0:19191 \
+    --reloader.config-file /etc/prometheus/prometheus.yml \
+    --prometheus.url http://127.0.0.1:9091
+```
+
+and
+
+```bash
+docker run -d --net=host --rm \
+    -v $(pwd)/prometheus-config/prometheus1_us1.yml:/etc/prometheus/prometheus.yml \
+    --name prometheus-1-sidecar-us1 \
+    -u root \
+    quay.io/thanos/thanos:v0.26.0 \
+    sidecar \
+    --http-address 0.0.0.0:19092 \
+    --grpc-address 0.0.0.0:19192 \
+    --reloader.config-file /etc/prometheus/prometheus.yml \
+    --prometheus.url http://127.0.0.1:9092
+```

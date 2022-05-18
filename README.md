@@ -117,7 +117,7 @@ docker run -d --net=host --rm \
 
 - Uncomment the 3 lines after L12 on the 3 prometheus config files to include the sidecars, can be verified by browsing to <http://localhost:9090/config> or by searching for `thanos_sidecar_prometheus_up` metric.
 
-## Adding thanos querier
+## Step 3: Adding thanos querier
 
 - Deploy thanos querier
 

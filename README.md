@@ -114,3 +114,5 @@ docker run -d --net=host --rm \
     --reloader.config-file /etc/prometheus/prometheus.yml \
     --prometheus.url http://127.0.0.1:9092
 ```
+
+- Uncomment the 3 lines after L12 on the 3 prometheus config files to include the sidecars, can be verified by browsing to <http://localhost:9090/config> or by searching for `thanos_sidecar_prometheus_up` metric.

@@ -62,5 +62,26 @@ docker run -d --net=host --rm \
 docker run -d --net=host --rm \
     -v $(pwd)/nginx/nginx.conf:/etc/nginx/conf.d/default.conf \
     --name nginx \
-    yannrobert/docker-nginx
+    nginx
 ```
+
+## Step 3: deploy query frontend
+
+```bash
+docker run -d --net=host --rm \
+    -v $(pwd)/query_frontend/frontend.yml:/etc/thanos/frontend.yml \
+    --name query-frontend \
+    quay.io/thanos/thanos:v0.26.0 \
+    query-frontend \
+    --http-address 0.0.0.0:20902 \
+    --query-frontend.compress-responses \
+    --query-frontend.downstream-url=http://127.0.0.1:10902 \
+    --query-frontend.log-queries-longer-than=5s \
+    --query-range.split-interval=1m \
+    --query-range.response-cache-max-freshness=1m \
+    --query-range.max-retries-per-request=5 \
+    --query-range.response-cache-config-file=/etc/thanos/frontend.yml \
+    --cache-compression-type="snappy"
+```
+
+To verify, run a query on querier <http://127.0.0.1:10902> it should be slow because it passes through nginx that has latency but if we try to go directly to query frontend it will be slow first time then faster after because query will be cached <http://127.0.0.1:20902>

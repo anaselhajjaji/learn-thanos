@@ -103,3 +103,10 @@ curl -X POST http://127.0.0.1:9091/-/reload
 
 we can verify the prometheus config: <http://127.0.0.1:9090/config> and <http://127.0.0.1:9091/config>
 
+To make sure that we can query data from each of our Prometheus instances from our Thanos Query instance. Navigate to the Thanos Query UI <http://127.0.0.1:39090>, and query for a metric like up - inspect the output and you should see batcave and batcomputer in the cluster label.
+
+At this point, we have:
+
+- Two prometheus instances configured to remote_write.
+- Thanos Receive component ingesting data from Prometheus
+- Thanos Query component configured to query Thanos Receive's Store API.

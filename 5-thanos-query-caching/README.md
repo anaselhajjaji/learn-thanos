@@ -62,7 +62,7 @@ docker run -d --net=host --rm \
 docker run -d --net=host --rm \
     -v $(pwd)/nginx/nginx.conf:/etc/nginx/conf.d/default.conf \
     --name nginx \
-    nginx
+    yannrobert/docker-nginx
 ```
 
 ## Step 3: deploy query frontend

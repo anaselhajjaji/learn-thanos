@@ -2,6 +2,8 @@
 
 The agent mode is optimized for efficient metric scraping and forwarding (i.e. immediate metric removal once it's securely delivered to a remote location).
 
+Prometheus Agent uses a fraction of the resources as normal Prometheus, by not enabling features like: local metrics storage and local query APIs.
+
 ## Step 1: setup thanos receive and thanos query environment
 
 ### thanos receive
@@ -90,4 +92,15 @@ quay.io/prometheus/prometheus:v2.32.0-beta.0 \
 
 Verify that prom-agent-batcopter is running by navigating to the [Batmobile Prometheus Agent UI](http://127.0.0.1:9091/targets).
 
-## Step3: 
+## Step3: Verify the setup
+
+At this point, we have:
+
+- Two Prometheus instances configured to remote_write and running in agent mode.
+- Thanos Receive component ingesting data from Prometheus
+- Thanos Query component configured to query Thanos Receive's Store API.
+
+To verify,
+
+- Navigate to thanos query <http://127.0.0.1:39090>
+- Query for up or go_goroutines - inspect the output and you should see batmobile and batcopter in the cluster label

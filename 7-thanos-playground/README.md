@@ -245,3 +245,54 @@ We can check whether the data is uploaded into thanos bucket by visiting <http:/
 
 ## Step 6: query long term data
 
+- start store gateway
+
+```bash
+docker run -d --net=host --rm \
+    -v $(pwd)/minio-config/minio-bucket.yaml:/etc/thanos/minio-bucket.yaml \
+    --name store-gateway \
+    quay.io/thanos/thanos:v0.26.0 \
+    store \
+    --objstore.config-file /etc/thanos/minio-bucket.yaml \
+    --http-address 0.0.0.0:19094 \
+    --grpc-address 0.0.0.0:19194
+```
+
+- point query to the store gateway
+
+```bash
+docker stop querier && \
+docker run -d --net=host --rm \
+    --name querier \
+    quay.io/thanos/thanos:v0.26.0 \
+    query \
+    --http-address 0.0.0.0:9090 \
+    --grpc-address 0.0.0.0:19190 \
+    --query.replica-label replica \
+    --store 127.0.0.1:19191 \
+    --store 127.0.0.1:19192 \
+    --store 127.0.0.1:19193 \
+    --store 127.0.0.1:19194
+```
+
+visit querier UI to verify <http://127.0.0.1:9090>
+
+## Step 7: retention dedup and downsamling
+
+- start the compactor
+
+```bash
+docker run -d --net=host --rm \
+    -v $(pwd)/minio-config/minio-bucket.yaml:/etc/thanos/minio-bucket.yaml \
+    --name compactor \
+    quay.io/thanos/thanos:v0.26.0 \
+    compact \
+    --wait --wait-interval 30s \
+    --consistency-delay 0s \
+    --objstore.config-file /etc/thanos/minio-bucket.yaml \
+    --http-address 0.0.0.0:19095
+```
+
+visit compactor ui to verify <http://127.0.0.1:19095/loaded>
+
+visit querier UI to make queries <http://127.0.0.1:9090>

@@ -30,3 +30,65 @@ mkdir $(pwd)/prom-eu1-replica1 && docker run -it --rm quay.io/thanos/thanosbench
 mkdir $(pwd)/prom-us1-replica0 && docker run -it --rm quay.io/thanos/thanosbench:v0.2.0-rc.1 block plan -p continuous-365d-tiny --labels 'cluster="us1"' --max-time=6h | \
     docker run -v $(pwd)/prom-us1-replica0:/out -i quay.io/thanos/thanosbench:v0.2.0-rc.1 block gen --output.dir /out
 ```
+
+## Step 2: Deploy prometheus
+
+- cluster="eu1", replica="0" Prometheus
+
+```bash
+docker run -d --net=host --rm \
+    -v $(pwd)/prometheus-config/prom-eu1-replica0-config.yaml:/etc/prometheus/prometheus.yml \
+    -v $(pwd)/prom-eu1-replica0:/prometheus \
+    -u root \
+    --name prom-eu1-0 \
+    quay.io/prometheus/prometheus:v2.20.0 \
+    --config.file=/etc/prometheus/prometheus.yml \
+    --storage.tsdb.path=/prometheus \
+    --storage.tsdb.retention.time=1000d \
+    --storage.tsdb.max-block-duration=2h \
+    --storage.tsdb.min-block-duration=2h \
+    --web.listen-address=:9091 \
+    --web.enable-lifecycle \
+    --web.enable-admin-api
+```
+
+- cluster="eu1", replica="1" Prometheus
+
+```bash
+docker run -d --net=host --rm \
+    -v $(pwd)/prometheus-config/prom-eu1-replica1-config.yaml:/etc/prometheus/prometheus.yml \
+    -v $(pwd)/prom-eu1-replica1:/prometheus \
+    -u root \
+    --name prom-eu1-1 \
+    quay.io/prometheus/prometheus:v2.20.0 \
+    --config.file=/etc/prometheus/prometheus.yml \
+    --storage.tsdb.path=/prometheus \
+    --storage.tsdb.retention.time=1000d \
+    --storage.tsdb.max-block-duration=2h \
+    --storage.tsdb.min-block-duration=2h \
+    --web.listen-address=:9092 \
+    --web.enable-lifecycle \
+    --web.enable-admin-api
+```
+
+- cluster="us1", replica="0" Prometheus
+
+```bash
+docker run -d --net=host --rm \
+    -v $(pwd)/prometheus-config/prom-us1-replica0-config.yaml:/etc/prometheus/prometheus.yml \
+    -v $(pwd)/prom-us1-replica0:/prometheus \
+    -u root \
+    --name prom-us1-0 \
+    quay.io/prometheus/prometheus:v2.20.0 \
+    --config.file=/etc/prometheus/prometheus.yml \
+    --storage.tsdb.path=/prometheus \
+    --storage.tsdb.retention.time=1000d \
+    --storage.tsdb.max-block-duration=2h \
+    --storage.tsdb.min-block-duration=2h \
+    --web.listen-address=:9093 \
+    --web.enable-lifecycle \
+    --web.enable-admin-api
+```
+
+## Step 3: deploy sidecars
+

@@ -92,3 +92,50 @@ docker run -d --net=host --rm \
 
 ## Step 3: deploy sidecars
 
+- cluster="eu1", replica="0" sidecar
+
+```bash
+docker run -d --net=host --rm \
+    -v $(pwd)/prometheus-config/prom-eu1-replica0-config.yaml:/etc/prometheus/prometheus.yml \
+    --name prom-eu1-0-sidecar \
+    -u root \
+    quay.io/thanos/thanos:v0.26.0 \
+    sidecar \
+    --http-address 0.0.0.0:19091 \
+    --grpc-address 0.0.0.0:19191 \
+    --reloader.config-file /etc/prometheus/prometheus.yml \
+    --prometheus.url "http://127.0.0.1:9091"
+```
+
+- cluster="eu1", replica="1" sidecar
+
+```bash
+docker run -d --net=host --rm \
+    -v $(pwd)/prometheus-config/prom-eu1-replica1-config.yaml:/etc/prometheus/prometheus.yml \
+    --name prom-eu1-1-sidecar \
+    -u root \
+    quay.io/thanos/thanos:v0.26.0 \
+    sidecar \
+    --http-address 0.0.0.0:19092 \
+    --grpc-address 0.0.0.0:19192 \
+    --reloader.config-file /etc/prometheus/prometheus.yml \
+    --prometheus.url "http://127.0.0.1:9092"
+```
+
+- cluster="us1", replica="0" sidecar
+
+```bash
+docker run -d --net=host --rm \
+    -v $(pwd)/prometheus-config/prom-us1-replica0-config.yaml:/etc/prometheus/prometheus.yml \
+    --name prom-us1-0-sidecar \
+    -u root \
+    quay.io/thanos/thanos:v0.26.0 \
+    sidecar \
+    --http-address 0.0.0.0:19093 \
+    --grpc-address 0.0.0.0:19193 \
+    --reloader.config-file /etc/prometheus/prometheus.yml \
+    --prometheus.url "http://127.0.0.1:9093"
+```
+
+## Step 4: deploy the querier
+
